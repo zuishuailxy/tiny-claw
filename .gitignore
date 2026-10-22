@@ -1,0 +1,57 @@
+*.egg-info/
+# ⚠️ 必须用 **/ 前缀：gitignore 的单个 * 不跨路径分隔符，
+# 旧写法 "*.claw/traces" 只能匹配根目录的 .claw，匹配不到 workspace/.claw
+**/.claw/traces/
+**/.claw/sandbox/
+**/.claw/offload/
+**/.claw/mcp-logs/
+**/.claw/logs/
+
+# ⚠️ 密钥文件：.env 绝不入库，只提交 .env.example 作为模板。
+# 注意顺序：先忽略全部 .env*，再用 ! 把模板放行。
+.env
+.env.*
+!.env.example
+
+# 虚拟环境与测试缓存
+.venv/
+__pycache__/
+.pytest_cache/
+
+# 构建产物与打包临时物
+*.egg-info/
+build/
+dist/
+.tmp/
+# 被取代的文档备份：留在磁盘备查，不入库
+.backup/
+# MCP 配置：真实文件含机器本地绝对路径，不入库；模板见 mcp.json.example
+mcp.json
+
+# 与项目无关的本地文件：保留在磁盘，但不入库（防 `git add -A` 误提交）
+Knowledge Hub.html
+Knowledge Hub_files/
+react.webp
+
+# 覆盖仓库根 .gitignore 的 **README.md：本项目 README 是构建必需
+!README.md
+!uv.lock
+# MCP server 本地依赖（npm 装，不入库）
+.mcp-servers/
+
+# md 的 HTML 导出（VSCode 预览、pandoc 等都会生成）。
+# 单一事实源是 .md —— 入库一份导出会出现「改了一个另一个没改」的必然漂移，
+# 而那正是 docs/ 里数字过期类问题的根源。
+*.html
+
+# 演示工作区里的临时文件：run.sh 的任务产物（如双subagent 演示用的 a.log /
+# b.log），不是夹具，测试与源码都零引用。
+workspace/*.log
+!workspace/error.log
+
+# 公开仓库不提交原始 trace / 历史归档
+reports/traces/
+reports/history/
+
+# 保留 reports 的说明文件
+!reports/README.md

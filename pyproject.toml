@@ -1,0 +1,55 @@
+[project]
+name = "tiny-claw"
+version = "0.1.0"
+description = "Autonomous coding agent runtime in Python — CLI + Feishu"
+readme = "README.md"
+requires-python = ">=3.12"
+# 只列真正 import 的包 —— 依赖表必须和代码对齐，否则装一堆用不上的东西，
+# 还会让人以为项目里有 FastAPI 服务 / LangGraph 编排（实际都是课程脚手架遗留）。
+#   推理循环是手写的，不走 LangGraph；HTTP 层是 openai / anthropic 官方 SDK；
+#   链路追踪只用 langsmith 的 @traceable（不依赖 LangChain）。
+dependencies = [
+    "openai>=2.44.0",
+    "anthropic>=0.40",
+    "lark-oapi>=1.4",
+    "langsmith>=0.3",
+    "python-dotenv>=1.0",
+    # MCP SDK 是**必装**依赖，不是可选extra。
+    # 曾经设成extra 的理由是「不想被 uvicorn / starlette 撑大」，但 `cli.py` 顶层
+    # import MCPManager、`_StderrRoutingGroup` 还继承 SDK 的真类—— 这条链没法
+    # 延迟加载。结果是`pip install tiny-claw` 装完连 `--help` 都跑不起来。
+    # 权衡：多 19 条传递依赖，换「一条命令就能跑起来」。有 uv.lock 时重量不敏感。
+    "mcp>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    # 测试里也要构造 SDK 的 StdioServerParameters（不发真实请求），
+    # 覆盖 MCP 的类型/常量/错误码时也直接 import `mcp`。
+    "mcp>=2.0",
+]
+
+[tool.uv]
+package = true
+
+[project.scripts]
+# 入口在包内（src/tiny_claw/cli.py）。根目录另留一个 main.py 兼容壳，
+# 使 `python main.py` 与 `tiny-claw` 两种用法都成立。
+tiny-claw = "tiny_claw.cli:main"
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# 固定临时目录：系统默认位置曾残留其他用户身份创建的 pytest-of-* 目录，
+# 导致 tmp_path 创建时报 PermissionError: EEXIST（一次挂掉 19 个用例）。
+# 固定到干净路径避免复发，详见 docs 与 .workbuddy/memory。
+addopts = "--basetemp=/tmp/tiny-claw-pytest"

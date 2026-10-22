@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "/ABSOLUTE/PATH/TO/node",
+      "args": [
+        "/ABSOLUTE/PATH/TO/mcp-servers/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "/ABSOLUTE/PATH/TO/workspace"
+      ],
+      "enabled": true,
+      "approval": "always",
+      "timeout": 120
+    },
+    "chrome-devtools": {
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/TO/python-tiny-claw/.mcp-servers/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js",
+        "--headless",
+        "--isolated",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "enabled": true,
+      "approval": "dangerous",
+      "timeout": 120
+    }
+  }
+}
